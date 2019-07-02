@@ -12,6 +12,7 @@ namespace Alexa.NET.Request
     public static class RequestVerification
     {
         private const int AllowedTimestampToleranceInSeconds = 150;
+        private static X509Certificate2 CachedCert;
 
         public static bool RequestTimestampWithinTolerance(SkillRequest request)
         {
@@ -30,7 +31,7 @@ namespace Alexa.NET.Request
                 return false;
             }
 
-            var certificate = await GetCertificate(certificatePath);
+            var certificate = CachedCert ?? (CachedCert = await GetCertificate(certificatePath));
             if (!ValidSigningCertificate(certificate) || !VerifyChain(certificate))
             {
                 return false;
